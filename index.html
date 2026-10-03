@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Times Tables">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Times Tables Voice Quiz</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
+body{background:#000;color:#fff}
+#app{width:100vw;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4vw;transition:background .15s,color .15s}
+.question{background:#000;color:#fff}.correct{background:#159b37;color:#fff}.wrong{background:#e53935;color:#000}
+#question{font-size:clamp(65px,14vw,190px);font-weight:800;line-height:1;margin:0 0 4vh}
+#heard{font-size:clamp(23px,4vw,50px);font-weight:700;min-height:1.3em}
+#sub{font-size:clamp(17px,2vw,27px);margin-top:12px;min-height:1.5em}
+#status{position:fixed;top:18px;left:22px;font-size:clamp(15px,1.7vw,22px);text-align:left}
+#score{position:fixed;top:18px;right:22px;font-size:clamp(18px,2.2vw,30px);font-weight:700}
+button{border:0;border-radius:18px;padding:18px 34px;font-size:clamp(22px,3vw,38px);font-weight:800;cursor:pointer}
+#repeat{position:fixed;bottom:18px;right:18px;font-size:17px;padding:10px 18px;display:none}
+#help{max-width:800px;margin-top:25px;font-size:clamp(16px,2vw,22px);line-height:1.45;opacity:.8}
+</style>
+</head>
+<body>
+<main id="app" class="question">
+<div id="status">Ready</div><div id="score">0 / 0</div>
+<div id="question">Times Tables</div><div id="heard"></div>
+<button id="start">Start Quiz</button>
+<div id="help">Allow microphone access once when you start. Best used with Chrome or Edge on localhost.</div>
+<div id="sub"></div><button id="repeat">↻ Repeat</button>
+</main>
+<script>
+(()=>{
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const $=s=>document.querySelector(s);
+const app=$("#app"),q=$("#question"),heard=$("#heard"),sub=$("#sub"),status=$("#status"),score=$("#score"),start=$("#start"),repeat=$("#repeat"),help=$("#help");
+let rec,a=0,b=0,ans=0,good=0,total=0,running=false,listening=false,speaking=false,gotResult=false,retry=0,watchdog=0;
+const praise=["Well done!","Excellent!","Great job!","That's right!","Brilliant!","Nice work!","Fantastic!","You got it!"];
+
+function parse(raw){
+ let s=(raw||"").toLowerCase().replace(/[-,]/g," ").replace(/\band\b/g," ");
+ let d=s.match(/\b\d+\b/); if(d)return +d[0];
+ const o={zero:0,oh:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19};
+ const t={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+ let n=0,f=false; for(const w of s.split(/\s+/)){if(w in o){n+=o[w];f=true}else if(w in t){n+=t[w];f=true}else if(w==="hundred"){n=(n||1)*100;f=true}} return f?n:NaN;
+}
+function stop(){clearTimeout(watchdog);if(rec&&listening){try{rec.abort()}catch{}}listening=false}
+function say(text,done){stop();speaking=true;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.95;let x=false;const end=()=>{if(x)return;x=true;speaking=false;done&&done()};u.onend=end;u.onerror=end;speechSynthesis.speak(u)}
+function listen(delay=250){setTimeout(()=>{
+ if(!running||speaking||listening)return;
+ gotResult=false;
+ try{rec.start()}catch{status.textContent="Restarting microphone…";listen(700)}
+},delay)}
+function newQ(){stop();app.className="question";a=1+Math.floor(Math.random()*10);b=1+Math.floor(Math.random()*12);ans=a*b;q.textContent=`${a} × ${b} = ?`;heard.textContent="";sub.textContent="";status.textContent="Listen…";say(`What is ${a} times ${b}?`,()=>listen())}
+function answer(text){
+ gotResult=true;clearTimeout(watchdog);const n=parse(text);heard.textContent=`You said: ${text}`;
+ if(Number.isNaN(n)){status.textContent="I didn't catch a number — try again";listen(700);return}
+ total++;
+ if(n===ans){good++;app.className="correct";q.textContent=`${ans} ✓`;sub.textContent=`${a} × ${b} = ${ans}`;status.textContent="Correct!";score.textContent=`${good} / ${total}`;say(praise[Math.floor(Math.random()*praise.length)],()=>setTimeout(newQ,900))}
+ else{app.className="wrong";q.textContent=`${a} × ${b} = ${ans}`;sub.textContent=`The correct answer is ${ans}`;status.textContent="Not quite";score.textContent=`${good} / ${total}`;say(`No. The answer is: ${a} times ${b} is ${ans}.`,()=>setTimeout(newQ,1300))}
+}
+if(SR){
+ rec=new SR();rec.lang="en-GB";rec.interimResults=false;rec.continuous=false;rec.maxAlternatives=5;
+ rec.onstart=()=>{listening=true;retry=0;status.textContent="Listening… say the answer";clearTimeout(watchdog);watchdog=setTimeout(()=>{if(listening&&!gotResult){status.textContent="I didn't hear you — listening again…";try{rec.abort()}catch{}}},6500)};
+ rec.onspeechstart=()=>status.textContent="I can hear you…";
+ rec.onresult=e=>{const r=e.results[e.results.length-1];let text=r[0].transcript;for(let i=0;i<r.length;i++)if(parse(r[i].transcript)===ans){text=r[i].transcript;break}answer(text)};
+ rec.onerror=e=>{clearTimeout(watchdog);if(!running)return;if(["not-allowed","service-not-allowed"].includes(e.error)){running=false;status.textContent="Microphone permission is blocked";sub.textContent="Allow microphone access for localhost, then reload.";return}if(e.error==="audio-capture"){running=false;status.textContent="No microphone available";return}if(e.error!=="aborted")status.textContent="I didn't hear you — listening again…"};
+ rec.onend=()=>{listening=false;clearTimeout(watchdog);if(running&&!speaking&&!gotResult){retry++;listen(Math.min(400+retry*150,1200))}};
+}
+start.onclick=()=>{if(!SR){q.textContent="Browser not supported";help.textContent="Use a recent Chrome or Edge browser.";return}running=true;start.style.display="none";help.style.display="none";repeat.style.display="block";document.documentElement.requestFullscreen?.().catch(()=>{});newQ()};
+repeat.onclick=()=>{if(running)say(`What is ${a} times ${b}?`,()=>listen())};
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
