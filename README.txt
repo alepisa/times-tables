@@ -23,3 +23,10 @@ a hosted database/backend. Do not put private database passwords in GitHub Pages
 
 After uploading, wait for GitHub Pages to deploy, refresh in Safari, then fully close and
 reopen the installed Home Screen app so the new service worker takes over.
+
+V7 iPhone input fix:
+- Moves the CRT/scanline overlay behind interactive controls.
+- Forces the name field and buttons above decorative layers.
+- Adds iOS-friendly touch/focus and text-input attributes.
+- Allows viewport adjustment when the iPhone keyboard opens.
+- New service worker cache tt-turbo-v7.
