@@ -1,11 +1,11 @@
 {
-  "name": "Times Tables Voice Quiz",
-  "short_name": "Times Tables",
+  "name": "Times Tables Turbo",
+  "short_name": "TT Turbo",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#050505",
+  "theme_color": "#050505",
   "icons": [
     {
       "src": "icon.svg",

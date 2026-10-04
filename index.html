@@ -1,59 +1,36 @@
-<!doctype html>
-<html lang="en">
-<head>
+<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#000000"><meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Times Tables"><link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon.svg">
-<title>Times Tables Voice Quiz</title>
+<meta name="theme-color" content="#050505"><meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><title>Times Tables Turbo</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif}
-#app{width:100vw;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5vw;background:#000;color:#fff;transition:.15s}
-#app.correct{background:#159b37;color:#fff}#app.wrong{background:#e53935;color:#000}
-#top{position:fixed;top:max(16px,env(safe-area-inset-top));left:18px;right:18px;display:flex;justify-content:space-between;font-weight:700;font-size:clamp(15px,3.5vw,24px)}
-#main{font-size:clamp(58px,15vw,180px);font-weight:800;line-height:1;margin-bottom:3vh}
-#heard{font-size:clamp(22px,5vw,46px);font-weight:700;min-height:1.3em}
-#sub{font-size:clamp(17px,4vw,26px);margin-top:12px;min-height:1.5em}
-button,input{font:inherit}button{border:0;border-radius:18px;padding:17px 30px;font-size:clamp(21px,5vw,34px);font-weight:800;cursor:pointer}
-input{width:min(520px,88vw);font-size:clamp(24px,6vw,38px);padding:16px 18px;border-radius:14px;border:2px solid #fff;text-align:center;margin:18px}
-#repeat{position:fixed;bottom:max(18px,env(safe-area-inset-bottom));right:18px;font-size:16px;padding:10px 16px;display:none}
-#status{position:fixed;bottom:max(18px,env(safe-area-inset-bottom));left:18px;font-size:15px;text-align:left;max-width:65vw}
-</style></head>
-<body><main id="app">
-<div id="top"><span id="player"></span><span id="score">Score 0/0 · Streak 0 · Best 0</span></div>
-<div id="main">What's your name?</div><div id="heard"></div>
-<input id="name" autocomplete="name" placeholder="Enter your name" maxlength="30">
-<button id="continue">Continue</button><button id="startQuiz" style="display:none">Start Quiz</button><div id="sub">We'll remember your best streak on this device.</div>
+:root{--g:#39ff78;--y:#ffe74a;--c:#3cecff;--r:#ff4058}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:"Courier New",monospace}
+#app{height:100dvh;display:flex;align-items:center;justify-content:center;text-align:center;padding:5vw;background:#050505;position:relative}
+#app:after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff08 0 1px,transparent 2px 4px)}
+.panel,#end{width:min(760px,94vw);border:4px solid var(--c);box-shadow:7px 7px 0 #d2298d;background:#080816;padding:24px}
+.logo{font-size:clamp(34px,9vw,74px);font-weight:900;color:var(--y);text-shadow:4px 4px #d2298d}.tag{color:var(--c);font-weight:bold;margin:10px 0 22px}
+input{width:100%;font:inherit;font-size:24px;padding:14px;text-align:center;background:#000;color:var(--g);border:3px solid var(--g)}
+button{font:inherit;font-weight:900;text-transform:uppercase;background:var(--y);border:0;border-bottom:6px solid #aa8700;padding:14px 22px;margin-top:16px;font-size:20px}
+#hud{position:fixed;top:max(12px,env(safe-area-inset-top));left:14px;right:14px;display:none;grid-template-columns:1fr auto 1fr;font-weight:900;z-index:3}#hud span:first-child{text-align:left}#hud span:last-child{text-align:right}#timer{color:var(--y);font-size:1.3em}
+#game{display:none}#q{font-size:clamp(62px,17vw,180px);font-weight:900}#heard{font-size:clamp(19px,5vw,36px);margin-top:20px;min-height:1.3em}#sub{margin-top:12px;font-size:clamp(16px,4vw,26px)}
+#status{position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:14px;font-size:13px}#repeat{display:none;position:fixed;right:14px;bottom:max(12px,env(safe-area-inset-bottom));margin:0;padding:9px 12px;font-size:14px}
+.correct{background:#063d16!important}.wrong{background:#5a0711!important}#end{display:none;max-height:90dvh;overflow:auto;border-color:var(--y)}.final{font-size:clamp(38px,10vw,76px);font-weight:900;color:var(--g)}
+.boards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.board{border:3px solid var(--c);padding:10px;text-align:left}.board h2{text-align:center;color:var(--y);font-size:18px}.row{display:grid;grid-template-columns:32px 1fr auto;gap:6px;padding:6px 0;border-bottom:1px dashed #555}.small{font-size:13px;color:#aaa;margin-top:12px}@media(max-width:620px){.boards{grid-template-columns:1fr}}
+</style></head><body><main id="app">
+<div id="hud"><span id="ph"></span><span id="timer">01:00</span><span id="sh">0 PTS</span></div>
+<section id="setup" class="panel"><div class="logo">TIMES TABLES<br>TURBO</div><div class="tag">★ 60 SECOND CHALLENGE ★</div><p id="setupText">PLAYER 1 — ENTER YOUR NAME</p><input id="name" maxlength="20" placeholder="YOUR NAME"><button id="ready">Ready!</button><button id="start" style="display:none">Start Game</button><div class="small">Correct answers build your streak. Score as many as you can before TIME UP.</div></section>
+<section id="game"><div id="q"></div><div id="heard"></div><div id="sub"></div></section>
 <div id="status"></div><button id="repeat">↻ Repeat</button>
-</main>
-<script>
-(()=>{
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition,$=s=>document.querySelector(s);
-const app=$("#app"),main=$("#main"),heard=$("#heard"),sub=$("#sub"),status=$("#status"),score=$("#score"),player=$("#player"),name=$("#name"),cont=$("#continue"),startQuiz=$("#startQuiz"),repeat=$("#repeat");
-let rec=null,stream=null,a,b,ans,good=0,total=0,streak=0,best=0,running=false,listening=false,speaking=false,got=false,watch=0,user="";
-const praise=["Well done!","Excellent!","Great job!","That's right!","Brilliant!","Nice work!","Fantastic!","You got it!"];
-function key(){return "tt-best-"+user.toLowerCase().replace(/\W+/g,"-")}
-function stats(){score.textContent=`Score ${good}/${total} · Streak ${streak} · Best ${best}`}
-function parse(raw){let s=(raw||"").toLowerCase().replace(/[-,]/g," ").replace(/\band\b/g," "),m=s.match(/\b\d+\b/);if(m)return +m[0];const o={zero:0,oh:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19},t={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};let n=0,f=false;for(const w of s.split(/\s+/)){if(w in o){n+=o[w];f=true}else if(w in t){n+=t[w];f=true}else if(w==="hundred"){n=(n||1)*100;f=true}}return f?n:NaN}
-function stop(){clearTimeout(watch);if(rec&&listening)try{rec.abort()}catch{}listening=false}
-function say(text,done){stop();speaking=true;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.rate=.95;let x=false;let end=()=>{if(x)return;x=true;speaking=false;done&&done()};u.onend=end;u.onerror=end;speechSynthesis.speak(u);setTimeout(end,5000)}
-function listen(ms=250){setTimeout(()=>{if(!running||speaking||listening)return;got=false;try{rec.start()}catch{status.textContent="Restarting listening…";listen(700)}},ms)}
-function makeQuestion(){a=1+Math.floor(Math.random()*10);b=1+Math.floor(Math.random()*12);ans=a*b}
-function next(){stop();makeQuestion();app.className="";main.textContent=`${a} × ${b} = ?`;heard.textContent="";sub.textContent="";status.textContent="Listen…";repeat.style.display="block";say(`What is ${a} times ${b}?`,()=>listen())}
-function answer(text){got=true;clearTimeout(watch);let n=parse(text);heard.textContent=`You said: ${text}`;if(Number.isNaN(n)){status.textContent="I didn't catch a number — try again";listen(700);return}total++;if(n===ans){good++;streak++;if(streak>best){best=streak;localStorage.setItem(key(),best)}app.className="correct";main.textContent=`${ans} ✓`;sub.textContent=`${a} × ${b} = ${ans}`;status.textContent=`Great, ${user}! Current streak: ${streak}`;stats();say(praise[Math.floor(Math.random()*praise.length)],()=>setTimeout(next,900))}else{streak=0;app.className="wrong";main.textContent=`${a} × ${b} = ${ans}`;sub.textContent=`The correct answer is ${ans}`;status.textContent="Streak reset — next one!";stats();say(`No. The answer is: ${a} times ${b} is ${ans}.`,()=>setTimeout(next,1300))}}
-async function prepareMic(){
- status.textContent="Requesting microphone access…";
- try{stream=await navigator.mediaDevices.getUserMedia({audio:true});status.textContent="Microphone ready ✓";return true}
- catch(e){status.textContent="Microphone access is required. Please allow it in Safari settings.";return false}
-}
-cont.onclick=async()=>{user=name.value.trim();if(!user){name.focus();return}player.textContent=user;best=+(localStorage.getItem(key())||0);stats();name.style.display="none";cont.style.display="none";main.textContent=`Hi ${user}!`;sub.textContent="First, allow microphone access.";let ok=await prepareMic();if(!ok)return;if(!SR){main.textContent="Speech recognition unavailable";sub.textContent="This browser does not provide the required speech-recognition feature.";return}sub.textContent="Microphone ready. Tap Start Quiz.";status.textContent="Microphone ready ✓";startQuiz.style.display="block"};
-startQuiz.onclick=()=>{startQuiz.style.display="none";running=true;stop();makeQuestion();app.className="";main.textContent=`${a} × ${b} = ?`;heard.textContent="";sub.textContent="";status.textContent="Listen…";repeat.style.display="block";say(`Hi ${user}. What is ${a} times ${b}?`,()=>listen())};
-name.addEventListener("keydown",e=>{if(e.key==="Enter")cont.click()});
-if(SR){rec=new SR();rec.lang="en-GB";rec.interimResults=false;rec.continuous=false;rec.maxAlternatives=5;rec.onstart=()=>{listening=true;status.textContent="Listening… say the answer";clearTimeout(watch);watch=setTimeout(()=>{if(listening&&!got){status.textContent="I didn't hear you — listening again…";try{rec.abort()}catch{}}},6500)};rec.onspeechstart=()=>status.textContent="I can hear you…";rec.onresult=e=>{let r=e.results[e.results.length-1],text=r[0].transcript;for(let i=0;i<r.length;i++)if(parse(r[i].transcript)===ans){text=r[i].transcript;break}answer(text)};rec.onerror=e=>{clearTimeout(watch);if(["not-allowed","service-not-allowed"].includes(e.error)){status.textContent="Speech recognition permission was blocked.";running=false}else if(e.error!=="aborted")status.textContent="I didn't hear you — listening again…"};rec.onend=()=>{listening=false;clearTimeout(watch);if(running&&!speaking&&!got)listen(500)}}
-repeat.onclick=()=>{if(!running||!Number.isFinite(a)||!Number.isFinite(b)){status.textContent="Start the quiz first.";return}say(`What is ${a} times ${b}?`,()=>listen())};
-window.addEventListener("beforeunload",()=>{running=false;stop();stream?.getTracks().forEach(t=>t.stop())});
-})();
-</script>
-<script>if("serviceWorker"in navigator&&location.protocol!=="file:")window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
-</body></html>
+<section id="end"><div>★ TIME'S UP ★</div><div class="final" id="final"></div><div id="detail"></div><div class="boards"><div class="board"><h2>★ BEST TODAY ★</h2><div id="today"></div></div><div class="board"><h2>★ ALL-TIME GREATS ★</h2><div id="all"></div></div></div><button id="again">Play Again</button><div class="small">This package stores scores on this device. config.js is included for the future shared online leaderboard.</div></section>
+</main><script src="config.js"></script><script>
+(()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition,$=x=>document.querySelector(x),app=$("#app"),setup=$("#setup"),game=$("#game"),end=$("#end"),name=$("#name"),ready=$("#ready"),start=$("#start"),setupText=$("#setupText"),hud=$("#hud"),ph=$("#ph"),timer=$("#timer"),sh=$("#sh"),q=$("#q"),heard=$("#heard"),sub=$("#sub"),status=$("#status"),repeat=$("#repeat"),final=$("#final"),detail=$("#detail"),today=$("#today"),all=$("#all"),again=$("#again");let rec,stream,user="",a=0,b=0,ans=0,score=0,total=0,streak=0,best=0,running=false,listening=false,speaking=false,got=false,watch,tick,endAt;const STORE="tt-turbo-v1",praise=["Awesome!","Radical!","Excellent!","Mega!","Correct!","Boom!"];
+function num(raw){let s=(raw||"").toLowerCase().replace(/[-,]/g," ").replace(/\band\b/g," "),m=s.match(/\b\d+\b/);if(m)return +m[0];let o={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19},t={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90},n=0,f=false;for(let w of s.split(/\s+/)){if(w in o){n+=o[w];f=true}else if(w in t){n+=t[w];f=true}else if(w==="hundred"){n=(n||1)*100;f=true}}return f?n:NaN}
+function stopRec(){clearTimeout(watch);if(rec&&listening)try{rec.abort()}catch{}listening=false}function say(t,d){stopRec();speaking=true;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t),x=false,e=()=>{if(x)return;x=true;speaking=false;if(running&&d)d()};u.rate=1.03;u.onend=e;u.onerror=e;speechSynthesis.speak(u);setTimeout(e,4200)}
+function listen(ms=120){setTimeout(()=>{if(!running||speaking||listening)return;got=false;try{rec.start()}catch{listen(450)}},ms)}function makeQ(){a=1+Math.floor(Math.random()*10);b=1+Math.floor(Math.random()*12);ans=a*b}function next(){if(!running)return;stopRec();makeQ();app.className="";q.textContent=`${a} × ${b} = ?`;heard.textContent="";sub.textContent="";status.textContent="LISTEN...";say(`What is ${a} times ${b}?`,()=>listen())}
+function hudup(){sh.textContent=`${score} PTS · ×${streak}`}function answer(t){if(!running)return;got=true;let n=num(t);heard.textContent=`> ${t}`;if(Number.isNaN(n)){listen(350);return}total++;if(n===ans){score++;streak++;best=Math.max(best,streak);app.className="correct";q.textContent=`${ans} ✓`;sub.textContent=`STREAK ×${streak}`;hudup();say(praise[Math.floor(Math.random()*praise.length)],()=>setTimeout(next,180))}else{streak=0;app.className="wrong";q.textContent=`${a} × ${b} = ${ans}`;sub.textContent="STREAK LOST";hudup();say(`No. ${a} times ${b} is ${ans}.`,()=>setTimeout(next,350))}}
+function day(){let d=new Date;return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`}function load(){try{return JSON.parse(localStorage.getItem(STORE)||"[]")}catch{return[]}}function save(){let x=load();x.push({name:user,score,total,best,date:day(),ts:Date.now()});x.sort((a,b)=>b.score-a.score||b.best-a.best||a.ts-b.ts);localStorage.setItem(STORE,JSON.stringify(x.slice(0,200)))}function board(el,x){el.innerHTML="";x.slice(0,5).forEach((r,i)=>{let d=document.createElement("div");d.className="row";d.textContent="";d.innerHTML=`<span>${i+1}.</span><span></span><span>${r.score}</span>`;d.children[1].textContent=r.name;el.appendChild(d)});if(!x.length)el.textContent="NO SCORES YET"}
+function finish(){if(!running)return;running=false;clearInterval(tick);stopRec();speechSynthesis.cancel();hud.style.display=game.style.display=repeat.style.display="none";app.className="";save();let x=load();final.textContent=`${score} POINT${score===1?"":"S"}`;detail.textContent=`${user} · ${score}/${total} correct · Best streak ×${best}`;board(today,x.filter(r=>r.date===day()));board(all,x);end.style.display="block";status.textContent="";speechSynthesis.speak(new SpeechSynthesisUtterance(`Time up, ${user}. Your score is ${score}.`))}
+function clock(){let l=Math.max(0,endAt-Date.now()),s=Math.ceil(l/1000);timer.textContent=`00:${String(s).padStart(2,"0")}`;if(l<=0)finish()}
+ready.onclick=async()=>{user=name.value.trim();if(!user)return name.focus();name.style.display=ready.style.display="none";setupText.textContent=`WELCOME, ${user.toUpperCase()}`;status.textContent="REQUESTING MICROPHONE...";try{stream=await navigator.mediaDevices.getUserMedia({audio:true});status.textContent="MICROPHONE READY ✓";if(!SR)throw Error();start.style.display="inline-block"}catch{status.textContent="MICROPHONE / SPEECH NOT AVAILABLE"}};
+start.onclick=()=>{score=total=streak=best=0;running=true;setup.style.display="none";game.style.display="block";hud.style.display="grid";repeat.style.display="block";ph.textContent=user.toUpperCase();hudup();endAt=Date.now()+60000;clock();tick=setInterval(clock,200);next()};again.onclick=()=>{end.style.display="none";setup.style.display="block";name.style.display="block";ready.style.display="inline-block";start.style.display="none";setupText.textContent="PLAYER 1 — ENTER YOUR NAME";status.textContent=""};repeat.onclick=()=>running&&a&&b&&say(`What is ${a} times ${b}?`,()=>listen());name.onkeydown=e=>e.key==="Enter"&&ready.click();
+if(SR){rec=new SR;rec.lang="en-GB";rec.interimResults=false;rec.continuous=false;rec.maxAlternatives=5;rec.onstart=()=>{listening=true;status.textContent="LISTENING...";watch=setTimeout(()=>{if(listening&&!got)try{rec.abort()}catch{}},5200)};rec.onresult=e=>{let r=e.results[e.results.length-1],t=r[0].transcript;for(let i=0;i<r.length;i++)if(num(r[i].transcript)===ans){t=r[i].transcript;break}answer(t)};rec.onerror=e=>{if(e.error!=="aborted")status.textContent="LISTENING AGAIN..."};rec.onend=()=>{listening=false;if(running&&!speaking&&!got)listen(300)}}})();
+</script><script>if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script></body></html>
