@@ -1,32 +1,23 @@
-TIMES TABLES TURBO v6
+TIMES TABLES v8 — MINIMAL
 
-Upload ALL files in this folder to the root of your existing GitHub Pages repository.
+This version deliberately removes the decorative arcade layers that could interfere
+with the name input. The name field is now a plain native HTML text input with no
+overlays or special touch handlers.
 
-Features:
-- 60-second game sessions
-- Correct-answer score
-- Current and best streak
-- End-of-game score screen
-- Best Today top 5
-- All-Time top 5
-- 1990s arcade-inspired visual treatment
-- PWA / Add to Home Screen support
-- Voice questions and spoken feedback
+Changes:
+- Minimal black/white design
+- Monospace/pixel-like retro typography only
+- Removed "Turbo" everywhere
+- Rebuilt name-entry screen from scratch
+- 60-second sessions retained
+- Current streak and best streak retained
+- Best Today and All Time local leaderboards retained
+- Green correct / red wrong feedback retained
+- Voice questions and spoken corrections retained
+- New service worker cache: times-tables-v8
 
-CURRENT LEADERBOARD:
-This ZIP works immediately and stores scores in localStorage, so Today's and All-Time
-leaderboards are for the current device/browser. This avoids requiring database credentials.
-
-SHARED LEADERBOARD:
-config.js is reserved for the next step. A truly shared leaderboard across phones needs
-a hosted database/backend. Do not put private database passwords in GitHub Pages files.
-
-After uploading, wait for GitHub Pages to deploy, refresh in Safari, then fully close and
-reopen the installed Home Screen app so the new service worker takes over.
-
-V7 iPhone input fix:
-- Moves the CRT/scanline overlay behind interactive controls.
-- Forces the name field and buttons above decorative layers.
-- Adds iOS-friendly touch/focus and text-input attributes.
-- Allows viewport adjustment when the iPhone keyboard opens.
-- New service worker cache tt-turbo-v7.
+GITHUB PAGES UPDATE:
+Replace the old repository files with index.html, manifest.webmanifest, sw.js and icon.svg.
+After GitHub Pages redeploys, refresh the website in Safari/Chrome. If an old installed PWA
+is still cached, remove the old Home Screen app, open the GitHub Pages URL in Safari again,
+then Add to Home Screen again.
